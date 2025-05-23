@@ -8,7 +8,7 @@ import EditorContainer from "./components/EditorContainer"
 const VideoEditor = () => {
   return (
     <EditorContainer>
-      <Navbar />
+      {/* <Navbar /> */}
       <div style={{ display: "flex", flex: 1 }}>
         <Panels />
         <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
