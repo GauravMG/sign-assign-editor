@@ -59,11 +59,11 @@ const Templates = () => {
       </Block>
       <Scrollable>
         <div style={{ padding: "0 1.5rem" }}>
-          <div style={{ display: "grid", gap: "0.5rem", gridTemplateColumns: "1fr 1fr" }}>
+          {/* <div style={{ display: "grid", gap: "0.5rem", gridTemplateColumns: "1fr 1fr" }}>
             {SAMPLE_TEMPLATES.map((item, index) => {
               return <ImageItem onClick={() => loadTemplate(item)} key={index} preview={`${item.preview}?tr=w-320`} />
             })}
-          </div>
+          </div> */}
         </div>
       </Scrollable>
     </Block>

@@ -105,9 +105,9 @@ const Text = () => {
               gap: "8px",
             }}
           >
-            {[...textComponents].map((tc) => (
+            {/* {[...textComponents].map((tc) => (
               <TextComponentItem onClick={addComponent} key={tc.id} component={tc} />
-            ))}
+            ))} */}
           </Block>
         </Block>
       </Scrollable>
