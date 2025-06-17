@@ -15,8 +15,15 @@ import SwapHorizontal from "~/components/Icons/SwapHorizontal"
 import { Tabs, Tab } from "baseui/tabs"
 import useSetIsSidebarOpen from "~/hooks/useSetIsSidebarOpen"
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
+import { Select } from "baseui/select"
 
 const colors = ["#ffffff", "#9B9B9B", "#4A4A4A", "#000000", "#A70C2C", "#DA9A15", "#F8E71D", "#47821A", "#4990E2"]
+
+const unitOptions = [
+  { label: "Inches (in)", id: "in" },
+  { label: "Feet (ft)", id: "ft" },
+]
+
 
 interface State {
   backgroundColor: string
@@ -166,6 +173,10 @@ const ResizeTemplate = () => {
   const [isOpen, setIsOpen] = React.useState(false)
   const [activeKey, setActiveKey] = React.useState<string | number>("0")
   const { currentDesign, setCurrentDesign } = useDesignEditorContext()
+  const [unit, setUnit] = React.useState<{ label: string; id: "px" | "in" | "ft" }>({
+    label: "Pixels (px)",
+    id: "px",
+  })
   const editor = useEditor()
   const [desiredFrame, setDesiredFrame] = React.useState({
     width: 0,
@@ -210,6 +221,9 @@ const ResizeTemplate = () => {
     (activeKey === "0" && selectedFrame.id !== 0) ||
     // @ts-ignore
     (activeKey === "1" && !!parseInt(desiredFrame.width) && !!parseInt(desiredFrame.height))
+
+  const convertPixelsToInches = (px: number, dpi = 96) => (px / dpi).toFixed(2)
+  const convertPixelsToFeet = (px: number, dpi = 96) => (px / dpi / 12).toFixed(2)
 
   return (
     <>
@@ -307,8 +321,26 @@ const ResizeTemplate = () => {
                         </Block>
                         <Block $style={{ fontSize: "13px", textAlign: "center" }}>
                           <Block $style={{ fontWeight: 500 }}>{sampleFrame.name}</Block>
-                          <Block $style={{ color: "rgb(119,119,119)" }}>
+                          {/* <Block $style={{ color: "rgb(119,119,119)" }}>
                             {sampleFrame.width} x {sampleFrame.height}px
+                          </Block> */}
+                          <Select
+                            options={unitOptions}
+                            value={[unit]} 
+                            onChange={({ value }) => {
+                              if (value && value.length > 0) {
+                                setUnit(value[0] as { label: string; id: "in" | "ft" })
+                              }
+                            }}
+                            clearable={false}
+                          />
+                          <Block>
+                            {unit.id === "px" &&
+                              `${sampleFrame.width} x ${sampleFrame.height}px`}
+                            {unit.id === "in" &&
+                              `${convertPixelsToInches(sampleFrame.width)} in × ${convertPixelsToInches(sampleFrame.height)} in`}
+                            {unit.id === "ft" &&
+                              `${convertPixelsToFeet(sampleFrame.width)} ft × ${convertPixelsToFeet(sampleFrame.height)} ft`}
                           </Block>
                         </Block>
                       </Block>
