@@ -24,7 +24,6 @@ const unitOptions = [
   { label: "Feet (ft)", id: "ft" },
 ]
 
-
 interface State {
   backgroundColor: string
 }
@@ -32,6 +31,11 @@ interface State {
 const Customize = () => {
   const editor = useEditor()
   const setIsSidebarOpen = useSetIsSidebarOpen()
+  const [unit, setUnit] = React.useState<{ label: string; id: "in" | "ft" }>({
+    label: "Inches (in)",
+    id: "in",
+  })
+  const frame = useFrame()
 
   const [state, setState] = React.useState<State>({
     backgroundColor: "#000000",
@@ -68,7 +72,13 @@ const Customize = () => {
         <Block padding="0 1.5rem">
           <Block>
             <ResizeTemplate />
-            <Block $style={{ fontSize: "14px", textAlign: "center", paddingTop: "0.35rem" }}>1080 x 1920px</Block>
+            {frame && (
+              <Block $style={{ fontSize: "14px", textAlign: "center", paddingTop: "0.35rem" }}>
+                {unit.id === "in"
+                  ? `${(frame.width / 96).toFixed(2)} in × ${(frame.height / 96).toFixed(2)} in`
+                  : `${(frame.width / 96 / 12).toFixed(2)} ft × ${(frame.height / 96 / 12).toFixed(2)} ft`}
+              </Block>
+            )}
           </Block>
 
           <Block paddingTop="0.5rem">
@@ -173,9 +183,9 @@ const ResizeTemplate = () => {
   const [isOpen, setIsOpen] = React.useState(false)
   const [activeKey, setActiveKey] = React.useState<string | number>("0")
   const { currentDesign, setCurrentDesign } = useDesignEditorContext()
-  const [unit, setUnit] = React.useState<{ label: string; id: "px" | "in" | "ft" }>({
-    label: "Pixels (px)",
-    id: "px",
+  const [unit, setUnit] = React.useState<{ label: string; id: "in" | "ft" }>({
+    label: "Inches (in)",
+    id: "in",
   })
   const editor = useEditor()
   const [desiredFrame, setDesiredFrame] = React.useState({
@@ -321,12 +331,9 @@ const ResizeTemplate = () => {
                         </Block>
                         <Block $style={{ fontSize: "13px", textAlign: "center" }}>
                           <Block $style={{ fontWeight: 500 }}>{sampleFrame.name}</Block>
-                          {/* <Block $style={{ color: "rgb(119,119,119)" }}>
-                            {sampleFrame.width} x {sampleFrame.height}px
-                          </Block> */}
                           <Select
                             options={unitOptions}
-                            value={[unit]} 
+                            value={[unit]}
                             onChange={({ value }) => {
                               if (value && value.length > 0) {
                                 setUnit(value[0] as { label: string; id: "in" | "ft" })
@@ -335,8 +342,6 @@ const ResizeTemplate = () => {
                             clearable={false}
                           />
                           <Block>
-                            {unit.id === "px" &&
-                              `${sampleFrame.width} x ${sampleFrame.height}px`}
                             {unit.id === "in" &&
                               `${convertPixelsToInches(sampleFrame.width)} in × ${convertPixelsToInches(sampleFrame.height)} in`}
                             {unit.id === "ft" &&
