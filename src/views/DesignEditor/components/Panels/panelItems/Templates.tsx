@@ -109,7 +109,7 @@ const ImageItem = ({ preview, onClick }: { preview: any; onClick?: (option: any)
           top: 0,
           left: 0,
           right: 0,
-          bottom: 0,
+          bottom: 0, 
           opacity: 0,
           transition: "opacity 0.3s ease-in-out",
           height: "100%",

@@ -122,9 +122,7 @@
 
 
 
-
-
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Block } from "baseui/block"
 import AngleDoubleLeft from "~/components/Icons/AngleDoubleLeft"
 import Scrollable from "~/components/Scrollable"
@@ -138,11 +136,48 @@ import { ILayer } from "@layerhub-io/types"
 import { toBase64 } from "~/utils/data"
 import { parsePSDToLayerhubObjects } from "~/utils/psd-parser"
 
+const BUILT_IN_PSD_LINKS = [
+  { name: "Shopping Bag Mockup", url: "/assets/templates/shopping-bag-mockup.psd" },
+  { name: "Template", url: "/assets/templates/template.psd" },
+]
+
 export default function UploadPanel() {
   const inputFileRef = React.useRef<HTMLInputElement>(null)
   const [uploads, setUploads] = React.useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const editor = useEditor()
   const setIsSidebarOpen = useSetIsSidebarOpen()
+
+  useEffect(() => {
+    const loadFiles = async () => {
+      for (const { name, url } of BUILT_IN_PSD_LINKS) {
+        try {
+          const response = await fetch(url)
+          const blob = await response.blob()
+          const file = new File([blob], name, { type: "image/vnd.adobe.photoshop" })
+          const base64 = (await toBase64(file)) as string
+          const layers = await parsePSDToLayerhubObjects(file)
+
+          if (layers.length > 0) {
+            const upload = {
+              id: nanoid(),
+              src: base64,
+              preview: layers[0].src,
+              type: "PSD",
+              file,
+              name,
+            }
+            setUploads((prev) => [...prev, upload])
+          }
+        } catch (err) {
+          console.error(`Failed to load built-in PSD: ${name}`, err)
+        }
+      }
+      setLoading(false)
+    }
+
+    loadFiles()
+  }, [])
 
   const handleDropFiles = async (files: FileList) => {
     const file = files[0]
@@ -193,23 +228,26 @@ export default function UploadPanel() {
 
   const addToCanvas = async (upload: any) => {
     if (!editor) return
-  
+
+    const canvasSize = { width: 7128, height: 2520 } // 99 inch x 35 inch at 72 DPI
+
     if (upload.type === "PSD") {
       const layers = await parsePSDToLayerhubObjects(upload.file)
       if (layers.length === 0) {
         alert("No layers found in the PSD file.")
         return
       }
-  
+
       for (const layer of layers) {
         await editor.objects.add({
-          type: "StaticImage",
-          src: layer.src,
+          ...layer,
           width: layer.width,
           height: layer.height,
-          name: layer.name,
+          name: layer.name || "Layer",
         })
       }
+
+      editor.frame.resize({ width: canvasSize.width, height: canvasSize.height })
     } else {
       await editor.objects.add({
         type: "StaticImage",
@@ -220,7 +258,6 @@ export default function UploadPanel() {
       })
     }
   }
-  
 
   return (
     <DropZone handleDropFiles={handleDropFiles}>
@@ -251,34 +288,40 @@ export default function UploadPanel() {
             </Button>
             <input onChange={handleFileInput} type="file" ref={inputFileRef} style={{ display: "none" }} />
 
-            <div
-              style={{
-                marginTop: "1rem",
-                display: "grid",
-                gap: "0.5rem",
-                gridTemplateColumns: "1fr 1fr",
-              }}
-            >
-              {uploads.map((upload) => (
-                <div
-                  key={upload.id}
-                  style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-                  onClick={() => addToCanvas(upload)}
-                >
-                  <div>
-                    <img
-                      width="100%"
-                      src={upload.preview || upload.url}
-                      alt="preview"
-                      style={{ borderRadius: 4, border: upload.type === "PSD" ? "2px dashed #aaa" : "none" }}
-                    />
-                    <div style={{ fontSize: "12px", textAlign: "center", marginTop: "4px" }}>
-                      {upload.type === "PSD" ? "PSD File" : upload.type === "StaticVideo" ? "Video" : "Image"}
+            <h4 style={{ marginTop: "1.5rem", fontWeight: 600 }}>Inbuilt PSD Files</h4>
+
+            {loading ? (
+              <div style={{ padding: "2rem", textAlign: "center" }}>Loading PSD files...</div>
+            ) : (
+              <div
+                style={{
+                  marginTop: "1rem",
+                  display: "grid",
+                  gap: "0.5rem",
+                  gridTemplateColumns: "1fr 1fr",
+                }}
+              >
+                {uploads.map((upload) => (
+                  <div
+                    key={upload.id}
+                    style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+                    onClick={() => addToCanvas(upload)}
+                  >
+                    <div>
+                      <img
+                        width="100%"
+                        src={upload.preview || upload.url}
+                        alt="preview"
+                        style={{ borderRadius: 4, border: upload.type === "PSD" ? "2px dashed #aaa" : "none" }}
+                      />
+                      <div style={{ fontSize: "12px", textAlign: "center", marginTop: "4px" }}>
+                        {upload.name || (upload.type === "PSD" ? "PSD File" : upload.type === "StaticVideo" ? "Video" : "Image")}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </Block>
         </Scrollable>
       </Block>
