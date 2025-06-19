@@ -8,7 +8,7 @@
 //   const [state, setState] = React.useState({
 //     image: "",
 //   })
-  
+
 
 //   const makePreview = React.useCallback(async () => {
 //     if (editor) {
@@ -59,7 +59,11 @@ const Graphic = () => {
   React.useEffect(() => {
     const loadSavedDesign = async () => {
       const savedDesign = localStorage.getItem("saved_design")
+      // const savedPreview = localStorage.getItem("saved_preview")
       const savedPreview = localStorage.getItem("saved_preview")
+      if (savedPreview) {
+        setState({ image: savedPreview })
+      }
 
       if (editor && savedDesign && savedPreview) {
         try {
