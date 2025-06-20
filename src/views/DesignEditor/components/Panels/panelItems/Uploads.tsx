@@ -135,6 +135,8 @@ import { captureFrame, loadVideoResource } from "~/utils/video"
 import { ILayer } from "@layerhub-io/types"
 import { toBase64 } from "~/utils/data"
 import { parsePSDToLayerhubObjects } from "~/utils/psd-parser"
+import { Input } from "baseui/input"
+
 
 const BUILT_IN_PSD_LINKS = [
   { name: "Shopping Bag Mockup", url: "/assets/templates/shopping-bag-mockup.psd" },
@@ -147,6 +149,22 @@ export default function UploadPanel() {
   const [loading, setLoading] = useState(true)
   const editor = useEditor()
   const setIsSidebarOpen = useSetIsSidebarOpen()
+
+
+  const [searchTerm, setSearchTerm] = useState("")
+  const [searchImages, setSearchImages] = useState<string[]>([])
+
+  const handleSearchImages = async () => {
+    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(searchTerm)}&per_page=20`, {
+      headers: {
+        Authorization: "mkR9Y49LLcVDGXa4MvmqolNVWgggS5YDCYE4Z9lt4dES10N3P5YlJLeb",
+      },
+    })
+
+    const data = await res.json()
+    const urls = data?.photos?.map((p: any) => p.src.large2x)
+    setSearchImages(urls)
+  }
 
   useEffect(() => {
     const loadFiles = async () => {
@@ -322,6 +340,60 @@ export default function UploadPanel() {
                 ))}
               </div>
             )}
+
+
+            <h4 style={{ marginTop: "1.5rem", fontWeight: 600 }}>Search Backgrounds Imgaes</h4>
+
+            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+              <Input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
+                placeholder="e.g. birthday, party, cake..."
+              />
+              <Button size={SIZE.compact} onClick={handleSearchImages}>
+                Search
+              </Button>
+            </div>
+
+            {searchImages.length > 0 && (
+              <div
+                style={{
+                  display: "grid",
+                  gap: "0.75rem",
+                  gridTemplateColumns: "1fr 1fr",
+                  marginBottom: "2rem",
+                }}
+              >
+                {searchImages.map((src, idx) => (
+                  <div
+                    key={idx}
+                    style={{ cursor: "pointer", borderRadius: 6, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }}
+                    onClick={() =>
+                      editor?.objects.add({
+                        type: "StaticImage",
+                        src,
+                        width: 1200,
+                        height: 800,
+                        name: `Search: ${searchTerm}`,
+                      })
+                    }
+                  >
+                    <img
+                      src={src}
+                      alt={searchTerm}
+                      loading="lazy"
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        height: "150px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
           </Block>
         </Scrollable>
       </Block>

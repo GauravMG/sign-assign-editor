@@ -6,4 +6,7 @@ import tsconfigPaths from "vite-tsconfig-paths"
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
   base: '/editor/',
+  optimizeDeps: {
+    include: ['@iconify/react', '@tsparticles/react', 'tsparticles'],
+  },
 })
