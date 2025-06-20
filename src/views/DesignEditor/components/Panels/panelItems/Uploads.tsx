@@ -306,7 +306,7 @@ export default function UploadPanel() {
             </Button>
             <input onChange={handleFileInput} type="file" ref={inputFileRef} style={{ display: "none" }} />
 
-            <h4 style={{ marginTop: "1.5rem", fontWeight: 600 }}>Inbuilt PSD Files</h4>
+            <h4 style={{ marginTop: "1.5rem", fontWeight: 600 }}>Default Designs</h4>
 
             {loading ? (
               <div style={{ padding: "2rem", textAlign: "center" }}>Loading PSD files...</div>
@@ -342,13 +342,13 @@ export default function UploadPanel() {
             )}
 
 
-            <h4 style={{ marginTop: "1.5rem", fontWeight: 600 }}>Search Backgrounds Imgaes</h4>
+            <h4 style={{ marginTop: "1.5rem", fontWeight: 600 }}>Search Imgaes</h4>
 
             <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
-                placeholder="e.g. birthday, party, cake..."
+                placeholder="Search images..."
               />
               <Button size={SIZE.compact} onClick={handleSearchImages}>
                 Search

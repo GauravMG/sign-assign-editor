@@ -24,6 +24,10 @@ export const BASE_ITEMS = [
     name: "Text",
   },
   // {
+  //   id: "icons", 
+  //   name: "Icons", 
+  // } ,
+  // {
   //   id: "graphics",
   //   name: "Graphics",
   // },

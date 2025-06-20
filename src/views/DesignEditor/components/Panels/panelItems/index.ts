@@ -14,9 +14,11 @@ import TextFill from "./TextFill"
 import PathFill from "./PathFill"
 import CanvasFill from "./CanvasFill"
 import TextEffects from "./TextEffects"
+import Icons from "./Icons"
 export default {
   StaticText: TextProperties,
   Text: Text,
+  Icons:Icons,
   Customize: Customize,
   FontSelector: FontSelector,
   Pixabay: Pixabay,
