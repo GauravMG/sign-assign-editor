@@ -143,6 +143,8 @@ const BUILT_IN_PSD_LINKS = [
   { name: "Template", url: "/assets/templates/template.psd" },
 ]
 
+const DEFAULT_IMAGE_POSITION = { x: 200, y: 200 }
+
 export default function UploadPanel() {
   const inputFileRef = React.useRef<HTMLInputElement>(null)
   const [uploads, setUploads] = React.useState<any[]>([])
@@ -154,17 +156,21 @@ export default function UploadPanel() {
   const [searchTerm, setSearchTerm] = useState("")
   const [searchImages, setSearchImages] = useState<string[]>([])
 
+  const [emojiSearch, setEmojiSearch] = useState("")
+  const [emojiIcons, setEmojiIcons] = useState<string[]>([])
+
   const handleSearchImages = async () => {
-    const res = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(searchTerm)}&per_page=20`, {
+    const res = await fetch(`/pexels/search?query=${encodeURIComponent(searchTerm)}&per_page=20`, {
       headers: {
         Authorization: "mkR9Y49LLcVDGXa4MvmqolNVWgggS5YDCYE4Z9lt4dES10N3P5YlJLeb",
       },
-    })
+    });
 
-    const data = await res.json()
-    const urls = data?.photos?.map((p: any) => p.src.large2x)
-    setSearchImages(urls)
-  }
+    const data = await res.json();
+    const urls = data?.photos?.map((p: any) => p.src.large2x);
+    setSearchImages(urls);
+  };
+
 
   useEffect(() => {
     const loadFiles = async () => {
@@ -247,7 +253,7 @@ export default function UploadPanel() {
   const addToCanvas = async (upload: any) => {
     if (!editor) return
 
-    const canvasSize = { width: 7128, height: 2520 } // 99 inch x 35 inch at 72 DPI
+    const canvasSize = { width: 7128, height: 2520 }
 
     if (upload.type === "PSD") {
       const layers = await parsePSDToLayerhubObjects(upload.file)
@@ -267,15 +273,53 @@ export default function UploadPanel() {
 
       editor.frame.resize({ width: canvasSize.width, height: canvasSize.height })
     } else {
-      await editor.objects.add({
-        type: "StaticImage",
-        src: upload.src,
-        width: 700,
-        height: 700,
-        name: "Upload",
-      })
+      const img = new Image()
+      img.onload = async () => {
+        const { width, height } = getScaledDimensions(img.width, img.height)
+        await editor.objects.add({
+          type: "StaticImage",
+          src: upload.src,
+          width,
+          height,
+          name: "Upload",
+          ...DEFAULT_IMAGE_POSITION,
+        })
+      }
+      img.src = upload.src
     }
   }
+
+  const handleSearchEmojis = async () => {
+    const keyword = encodeURIComponent(emojiSearch)
+    const sources = ["noto", "twemoji"]
+    let allIcons: string[] = []
+
+    for (const prefix of sources) {
+      const res = await fetch(`https://api.iconify.design/search?query=${keyword}&prefix=${prefix}&limit=20`)
+      const data = await res.json()
+
+      if (Array.isArray(data.icons)) {
+        for (const iconName of data.icons) {
+          const iconId = iconName
+          const check = await fetch(`https://api.iconify.design/${iconId}.svg`)
+          if (check.ok) {
+            allIcons.push(iconId)
+          }
+        }
+      }
+    }
+
+    setEmojiIcons(allIcons)
+  }
+
+  const getScaledDimensions = (imgWidth: number, imgHeight: number, maxWidth = 1000, maxHeight = 1000) => {
+    const ratio = Math.min(maxWidth / imgWidth, maxHeight / imgHeight)
+    return {
+      width: imgWidth * ratio,
+      height: imgHeight * ratio,
+    }
+  }
+
 
   return (
     <DropZone handleDropFiles={handleDropFiles}>
@@ -348,7 +392,7 @@ export default function UploadPanel() {
               <Input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm((e.target as HTMLInputElement).value)}
-                placeholder="Search images..."
+                placeholder="Search..."
               />
               <Button size={SIZE.compact} onClick={handleSearchImages}>
                 Search
@@ -367,7 +411,12 @@ export default function UploadPanel() {
                 {searchImages.map((src, idx) => (
                   <div
                     key={idx}
-                    style={{ cursor: "pointer", borderRadius: 6, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.2)" }}
+                    style={{
+                      cursor: "pointer",
+                      borderRadius: 6,
+                      overflow: "hidden",
+                      boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                    }}
                     onClick={() =>
                       editor?.objects.add({
                         type: "StaticImage",
@@ -375,6 +424,7 @@ export default function UploadPanel() {
                         width: 1200,
                         height: 800,
                         name: `Search: ${searchTerm}`,
+                        ...DEFAULT_IMAGE_POSITION,
                       })
                     }
                   >
@@ -394,9 +444,82 @@ export default function UploadPanel() {
               </div>
             )}
 
+            {/* search emoji  */}
+            <h4 style={{ marginTop: "1.5rem", fontWeight: 600 }}>Search Emojis / Icons</h4>
+
+            <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+              <Input
+                value={emojiSearch}
+                onChange={(e) => setEmojiSearch((e.target as HTMLInputElement).value)}
+                placeholder="Search..."
+              />
+              <Button size={SIZE.compact} onClick={handleSearchEmojis}>
+                Search
+              </Button>
+            </div>
+            {emojiIcons?.map((icon, idx) => {
+              const src = `https://api.iconify.design/${icon}.svg`
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    cursor: "pointer",
+                    borderRadius: 6,
+                    overflow: "hidden",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                  }}
+                  onClick={async () => {
+                    try {
+                      const svgText = await fetch(src).then((res) => res.text())
+                      const svgBlob = new Blob([svgText], { type: "image/svg+xml" })
+                      const url = URL.createObjectURL(svgBlob)
+
+                      const image = new Image()
+                      image.onload = async () => {
+                        const canvas = document.createElement("canvas")
+                        canvas.width = 800
+                        canvas.height = 800
+                        const ctx = canvas.getContext("2d")
+                        if (ctx) {
+                          ctx.clearRect(0, 0, canvas.width, canvas.height)
+                          ctx.drawImage(image, 0, 0, 800, 800)
+                          const base64 = canvas.toDataURL("image/png")
+
+                          await editor?.objects.add({
+                            type: "StaticImage",
+                            src: base64,
+                            width: 800,
+                            height: 800,
+                            name: `Emoji: ${icon}`,
+                            ...DEFAULT_IMAGE_POSITION,
+                          })
+                        }
+                        URL.revokeObjectURL(url)
+                      }
+                      image.src = url
+                    } catch (error) {
+                      console.error("Emoji add failed", error)
+                    }
+                  }}
+                >
+                  <img
+                    src={src}
+                    alt={icon}
+                    loading="lazy"
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      height: "100px",
+                      objectFit: "contain",
+                      padding: "10px",
+                    }}
+                  />
+                </div>
+              )
+            })}
           </Block>
         </Scrollable>
-      </Block>
-    </DropZone>
+      </Block >
+    </DropZone >
   )
 }

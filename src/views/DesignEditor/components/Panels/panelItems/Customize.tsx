@@ -208,24 +208,33 @@ const ResizeTemplate = () => {
     }
   }, [frame])
 
-  const applyResize = () => {
-    // @ts-ignore
-    const size = activeKey === "0" ? selectedFrame : desiredFrame
-    if (editor) {
-      editor.frame.resize({
-        width: parseInt(size.width),
-        height: parseInt(size.height),
-      })
-      setCurrentDesign({
-        ...currentDesign,
-        frame: {
-          width: parseInt(size.width),
-          height: parseInt(size.height),
-        },
-      })
-    }
-    setIsOpen(false)
+  React.useEffect(() => {
+  const storedSize = localStorage.getItem("editor_frame_size")
+  if (storedSize && editor) {
+    const { width, height } = JSON.parse(storedSize)
+    editor.frame.resize({ width, height })
   }
+}, [editor])
+
+const applyResize = () => {
+  const size = activeKey === "0" ? selectedFrame : desiredFrame
+  if (editor) {
+    const width = parseInt(size.width)
+    const height = parseInt(size.height)
+
+    editor.frame.resize({ width, height })
+
+    setCurrentDesign({
+      ...currentDesign,
+      frame: { width, height },
+    })
+
+    localStorage.setItem("editor_frame_size", JSON.stringify({ width, height }))
+  }
+
+  setIsOpen(false)
+}
+
   const isEnabled =
     // @ts-ignore
     (activeKey === "0" && selectedFrame.id !== 0) ||
@@ -299,7 +308,7 @@ const ResizeTemplate = () => {
             }}
             activeKey={activeKey}
             onChange={({ activeKey }) => {
-              setActiveKey(activeKey)
+              setActiveKey(activeKey as any)
             }}
           >
             <Tab title="Preset size">
