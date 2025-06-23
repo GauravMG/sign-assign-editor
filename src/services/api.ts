@@ -10,7 +10,6 @@ class ApiService {
   base: AxiosInstance
   constructor() {
     this.base = axios.create({
-      // baseURL: "http://localhost:8080",
       baseURL: "https://burly-note-production.up.railway.app",
       headers: {
         Authorization: "Bearer QYT8s1NavSTpTAxURji98Fpg",

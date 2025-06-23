@@ -302,9 +302,6 @@ const Text = () => {
             Effects
           </Button>
           <Block width="1px" height="24px" backgroundColor="rgb(213,213,213)" margin="0 4px" />
-          <Button size={SIZE.compact} kind={KIND.tertiary}>
-            Animate
-          </Button>
         </Block>
       </Block>
       <Common />
