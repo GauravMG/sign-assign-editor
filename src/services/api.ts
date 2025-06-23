@@ -251,6 +251,49 @@ class ApiService {
       }
     })
   }
+
+  // getCustomTemplateList(): Promise<any[]> {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const payload = {
+  //         filter: { productId: 4 },
+  //         range: { all: true },
+  //         sort: [{ orderBy: "createdAt", orderDir: "desc" }],
+  //         linkedEntities: true,
+  //       }
+  //       const { data } = await axios.post("http://3.109.198.252/api/v1/template/list", payload, {
+  //         headers: {
+  //           Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1MDY2NDk5MSwiZXhwIjoxNzUwNzUxMzkxfQ.n9UwWuyzRb1VmazGx-nyEkRNjBFgCcIlEHr-tPTWCxU",
+  //           "Content-Type": "application/json",
+  //         },
+  //       })
+  //       resolve(data?.data || [])
+  //     } catch (err) {
+  //       reject(err)
+  //     }
+  //   })
+  // }
+  getCustomTemplateList(productId: number, token: string): Promise<any[]> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const payload = {
+          filter: { productId },
+          range: { all: true },
+          sort: [{ orderBy: "createdAt", orderDir: "desc" }],
+          linkedEntities: true,
+        }
+        const { data } = await axios.post("http://3.109.198.252/api/v1/template/list", payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+        resolve(data?.data || [])
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
 }
 
-export default new ApiService()
+export default ApiService
