@@ -525,18 +525,6 @@ export default Templates
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 // // import React, { useEffect, useState } from "react"
 // // import { useEditor } from "@layerhub-io/react"
 // // import { Block } from "baseui/block"
