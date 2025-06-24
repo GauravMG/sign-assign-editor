@@ -32,19 +32,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Canvas.tsx
 import React from "react"
 import { Canvas as LayerhubCanvas } from "@layerhub-io/react"
