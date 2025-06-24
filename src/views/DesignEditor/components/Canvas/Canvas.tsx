@@ -98,7 +98,7 @@ const Canvas = () => {
           display: "flex",
           justifyContent: "flex-end",
           alignItems: "center",
-          padding: "0 24px",
+          padding: "0 0px",
           background: "#ffffff",
           borderTop: "1px solid #e0e0e0",
           boxShadow: "0 -2px 6px rgba(0,0,0,0.04)",
