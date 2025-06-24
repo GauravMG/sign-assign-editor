@@ -7,7 +7,7 @@ interface ModalProps {
   width?: string
 }
 
-const Modal: React.FC<ModalProps> = ({ onClose, children, width = "900px" }) => {
+const ReviewModal: React.FC<ModalProps> = ({ onClose, children, width = "900px" }) => {
   return (
     <div
       style={{
@@ -55,4 +55,4 @@ const Modal: React.FC<ModalProps> = ({ onClose, children, width = "900px" }) => 
   )
 }
 
-export default Modal
+export default ReviewModal

@@ -51,7 +51,7 @@ import { Canvas as LayerhubCanvas } from "@layerhub-io/react"
 import Playback from "../Playback"
 import useDesignEditorContext from "~/hooks/useDesignEditorContext"
 import ContextMenu from "../ContextMenu"
-import Modal from "../Panels/panelItems/ReviewTemplateModal"
+import ReviewModal from "../Panels/panelItems/ReviewTemplateModal"
 
 const Canvas = () => {
   const { displayPlayback } = useDesignEditorContext()
@@ -125,7 +125,7 @@ const Canvas = () => {
       </div>
 
       {showModal && selectedTemplate && (
-        <Modal onClose={() => setShowModal(false)} width="1000px">
+        <ReviewModal onClose={() => setShowModal(false)} width="1000px">
           <div style={{ display: "flex", gap: "2rem", alignItems: "flex-start", justifyContent: "space-between" }}>
             {/* Left: Image + Edit Button */}
             <div style={{ flex: 1, textAlign: "center", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
@@ -207,7 +207,7 @@ const Canvas = () => {
               </button>
             </div>
           </div>
-        </Modal>
+        </ReviewModal>
       )}
     </div>
   )
