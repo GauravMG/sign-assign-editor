@@ -1,0 +1,14 @@
+module.exports = {
+    apps: [
+      {
+        name: 'sign-assign-editor',
+        script: 'npm',
+        args: 'run serve',
+        instances: 1,
+        autorestart: true,
+        watch: false,
+        max_memory_restart: '300M'
+      }
+    ]
+  };
+  
