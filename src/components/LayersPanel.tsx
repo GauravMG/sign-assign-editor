@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { List, Button, Tooltip, Input, message } from "antd";
+import { List, Button, Tooltip, Input, message, Spin } from "antd";
 import {
     ArrowUpOutlined,
     ArrowDownOutlined,
@@ -27,20 +27,25 @@ const LayersPanel: React.FC<LayersPanelProps> = ({ canvas }) => {
     const [layers, setLayers] = useState<LayerItem[]>([]);
     const [editingLayerId, setEditingLayerId] = useState<string | null>(null);
     const [nameEdits, setNameEdits] = useState<{ [id: string]: string }>({});
+    const [loading, setLoading] = useState(false);
 
     const updateLayers = () => {
         if (canvas) {
-            const objs = canvas.getObjects().slice().reverse();
-            const data = objs.map((obj: any, i) => ({
-                object: obj,
-                id: obj.__uid || `layer-${i}`,
-                name: obj.name || obj.id || obj.type || `Layer ${i + 1}`,
-                type: obj.type || "unknown",
-                visible: obj.visible !== false,
-            }));
-            setLayers(data);
+            setLoading(true);
+            setTimeout(() => {
+                const objs = canvas.getObjects().slice().reverse();
+                const data = objs.map((obj: any, i) => ({
+                    object: obj,
+                    id: obj.__uid || `layer-${i}`,
+                    name: obj.name || obj.id || obj.type || `Layer ${i + 1}`,
+                    type: obj.type || "unknown",
+                    visible: obj.visible !== false,
+                }));
+                setLayers(data);
+                setLoading(false);
+            }, 0);
         }
-    };
+    };    
 
     useEffect(() => {
         if (!canvas) return;
@@ -62,50 +67,71 @@ const LayersPanel: React.FC<LayersPanelProps> = ({ canvas }) => {
         };
     }, [canvas]);
 
+    const runWithLoading = async (fn: () => void | Promise<void>) => {
+        setLoading(true);
+        try {
+            await fn();
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const selectLayer = (obj: fabric.Object) => {
-        canvas?.setActiveObject(obj);
-        canvas?.renderAll();
+        runWithLoading(() => {
+            canvas?.setActiveObject(obj);
+            canvas?.renderAll();
+        });
     };
 
     const bringForward = (obj: fabric.Object) => {
-        canvas?.bringForward(obj);
-        canvas?.renderAll();
-        updateLayers();
+        runWithLoading(() => {
+            canvas?.bringForward(obj);
+            canvas?.renderAll();
+            updateLayers();
+        });
     };
 
     const sendBackward = (obj: fabric.Object) => {
-        canvas?.sendBackwards(obj);
-        canvas?.renderAll();
-        updateLayers();
+        runWithLoading(() => {
+            canvas?.sendBackwards(obj);
+            canvas?.renderAll();
+            updateLayers();
+        });
     };
 
     const deleteLayer = (obj: fabric.Object) => {
-        canvas?.remove(obj);
-        canvas?.discardActiveObject();
-        canvas?.renderAll();
-        updateLayers();
-        message.success("Layer deleted");
+        runWithLoading(() => {
+            canvas?.remove(obj);
+            canvas?.discardActiveObject();
+            canvas?.renderAll();
+            updateLayers();
+            message.success("Layer deleted");
+        });
     };
 
     const toggleVisibility = (layer: LayerItem) => {
-        layer.object.set("visible", !layer.visible);
-        canvas?.renderAll();
-        updateLayers();
+        runWithLoading(() => {
+            layer.object.set("visible", !layer.visible);
+            canvas?.renderAll();
+            updateLayers();
+        });
     };
 
     const saveLayerName = (layerId: string, obj: fabric.Object) => {
-        const newName = nameEdits[layerId];
-        if (newName && newName.trim() !== "") {
-            obj.set("name", newName.trim());
-            canvas?.renderAll();
-            message.success("Layer renamed");
-        }
-        setEditingLayerId(null);
-        updateLayers();
+        runWithLoading(() => {
+            const newName = nameEdits[layerId];
+            if (newName && newName.trim() !== "") {
+                obj.set("name", newName.trim());
+                canvas?.renderAll();
+                message.success("Layer renamed");
+            }
+            setEditingLayerId(null);
+            updateLayers();
+        });
     };
 
     return (
-        <div style={{ width: "100%" }}>
+        <Spin spinning={loading}>
             <List
                 size="small"
                 bordered
@@ -250,7 +276,7 @@ const LayersPanel: React.FC<LayersPanelProps> = ({ canvas }) => {
                     );
                 }}
             />
-        </div>
+        </Spin>
     );
 };
 

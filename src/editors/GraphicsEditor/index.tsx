@@ -21,6 +21,10 @@ const { Sider, Content } = Layout;
 
 const VITE_BASE_PATH_WEB = "http://3.109.198.252";
 const VITE_BASE_PATH_API = "http://3.109.198.252/api";
+
+// const VITE_BASE_PATH_WEB = "http://localhost:8080";
+// const VITE_BASE_PATH_API = "http://10.10.10.17:9101";
+
 const VITE_APP_PEXELS_BASE_PATH = "https://api.pexels.com";
 const VITE_APP_PEXELS_KEY =
 	"fTBKKibPmBScb8OMT84k2eHqgcPZ8dzJ298bhiY1n40OECYCSj95msoM";
@@ -41,6 +45,7 @@ const GraphicsEditor: React.FC = () => {
 	const [loading, setLoading] = useState(false);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [designURL, setDesignURL] = useState<string | null>(null);
+	const [uploading, setUploading] = useState(false);
 
 	useEffect(() => {
 		const init = async () => {
@@ -120,48 +125,64 @@ const GraphicsEditor: React.FC = () => {
 			message.error("Canvas is not initialized.");
 			return;
 		}
-
+	
+		setUploading(true);
+	
+		const hide = message.loading({
+			content: "Uploading your design...",
+			key: "upload",
+			duration: 0,
+		});
+	
 		try {
 			// 1. Export SVG string
 			const svgString = canvasRef.current.toSVG();
-
+	
 			// 2. Convert to File
 			const blob = new Blob([svgString], { type: "image/svg+xml" });
 			const file = new File([blob], "design.svg", {
 				type: "image/svg+xml",
 			});
-
+	
 			// 3. Upload as FormData
 			const formData = new FormData();
 			formData.append("file", file);
-
-			let headers: any = {}
-			let token = localStorage.getItem("token") || ""
+	
+			let headers: any = {};
+			let token = localStorage.getItem("token") || "";
 			if (token.length) {
 				headers = {
 					...headers,
-					Authorization: `Bearer ${token}`
-				}
+					Authorization: `Bearer ${token}`,
+				};
 			}
-			const response = await fetch(`${VITE_BASE_PATH_API}/v1/upload/artwork`, {
-				method: "POST",
-				headers,
-				body: formData,
-			});
-
+	
+			const response = await fetch(
+				`${VITE_BASE_PATH_API}/v1/upload/artwork`,
+				{
+					method: "POST",
+					headers,
+					body: formData,
+				}
+			);
+	
 			if (!response.ok) {
 				throw new Error("Upload API failed");
 			}
-
+	
 			const { data } = await response.json();
-
+	
 			console.log("Upload successful:", data);
-
-			message.success("Design uploaded successfully!");
-
+	
+			message.success({
+				content: "Design uploaded successfully!",
+				key: "upload",
+			});
+	
 			const returnUrl = localStorage.getItem("returnUrl") || "";
 			const productId = localStorage.getItem("productId") || "";
-			const selectedTemplateId = localStorage.getItem("selectedTemplateId") || "";
+			const selectedTemplateId =
+				localStorage.getItem("selectedTemplateId") || "";
 			const dataObj = {
 				url: data.url,
 				previewUrl: data.previewUrl,
@@ -169,23 +190,29 @@ const GraphicsEditor: React.FC = () => {
 				size: data.size,
 				mediaType: data.mediaType,
 			};
-
+	
 			const params = new URLSearchParams();
 			params.set("productId", productId);
 			params.set("selectedTemplateId", selectedTemplateId);
 			params.set("dataObject", JSON.stringify(dataObj));
-
+	
 			const encoded = btoa(params.toString());
-
+	
 			setIsModalVisible(false);
-
+	
 			const separator = returnUrl.includes("?") ? "&" : "?";
 			window.location.href = `${returnUrl}${separator}data=${encoded}`;
 		} catch (error) {
 			console.error(error);
-			message.error("Failed to upload design.");
+			message.error({
+				content: "Failed to upload design.",
+				key: "upload",
+			});
+		} finally {
+			hide();
+			setUploading(false);
 		}
-	};
+	};	
 
 	const addText = () => {
 		const text = new fabric.Textbox("Edit me!", {
@@ -404,13 +431,46 @@ const GraphicsEditor: React.FC = () => {
 
 				canvasRef.current?.clear();
 
-				objects.forEach((obj) => {
+				// objects.forEach((obj) => {
+				// 	obj.scale(scale);
+				// 	obj.set({
+				// 		left: (obj.left || 0) * scale + offsetX,
+				// 		top: (obj.top || 0) * scale + offsetY,
+				// 		selectable: true,
+				// 	});
+				// 	canvasRef.current?.add(obj);
+				// });
+				objects.forEach((obj: any) => {
+					// Make text editable
+					// if (obj instanceof fabric.Text || obj.type === "text" || obj.text?.length) {
+					// 	obj.set({
+					// 		editable: true,
+					// 		selectable: true,
+					// 		evented: true,
+					// 	});
+					// }
+					if (obj instanceof fabric.Text && !(obj instanceof fabric.Textbox)) {
+						const textbox = new fabric.Textbox(obj.text || "", {
+							left: (obj.left || 0) * scale + offsetX,
+							top: (obj.top || 0) * scale + offsetY,
+							fontSize: obj.fontSize,
+							fontFamily: obj.fontFamily,
+							fill: obj.fill,
+							editable: true,
+							selectable: true,
+							evented: true,
+						});
+						obj = textbox;
+					}
+				
 					obj.scale(scale);
 					obj.set({
 						left: (obj.left || 0) * scale + offsetX,
 						top: (obj.top || 0) * scale + offsetY,
 						selectable: true,
+						evented: true,
 					});
+				
 					canvasRef.current?.add(obj);
 				});
 
@@ -746,6 +806,7 @@ const GraphicsEditor: React.FC = () => {
 
 						<Button
 							onClick={handleEditDesign}
+							disabled={uploading}
 							style={{
 								marginTop: 16,
 								color: "#452e73",
@@ -771,6 +832,7 @@ const GraphicsEditor: React.FC = () => {
 							type="primary"
 							onClick={handleAddToCart}
 							size="large"
+							disabled={uploading}
 							style={{
 								marginTop: 24,
 								background: "#452e73",
