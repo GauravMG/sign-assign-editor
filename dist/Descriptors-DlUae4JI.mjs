@@ -1,0 +1,19 @@
+const e = [{ name: "Marker", description: "", type: "marker", icon: { prefix: "fas", name: "map-marker-alt" }, option: { type: "i-text", text: "", fontFamily: "Font Awesome 5 Free", fontWeight: 900, fontSize: 60, width: 30, height: 30, editable: !1, name: "New marker" } }], t = [{ name: "Text", description: "", type: "text", icon: { prefix: "fas", name: "font" }, option: { type: "textbox", text: "", width: 60, height: 30, fontSize: 32, name: "New text" } }], i = [{ name: "Image", description: "", type: "image", icon: { prefix: "fas", name: "image" }, option: { type: "image", name: "New image", src: "./images/sample/transparentBg.png" } }, { name: "GIF", description: "", type: "gif", icon: { prefix: "fas", name: "image" }, option: { type: "gif", width: 400, height: 400, name: "New gif", src: "" } }], n = [{ name: "Triangle", description: "", type: "shape", icon: { prefix: "fas", name: "play", style: { transform: "rotate(270deg)" } }, option: { type: "triangle", width: 30, height: 30, name: "New shape" } }, { name: "Rectangle", description: "", type: "shape", icon: { prefix: "fas", name: "stop" }, option: { type: "rect", width: 40, height: 40, name: "New shape" } }, { name: "Circle", description: "", type: "shape", icon: { prefix: "fas", name: "circle" }, option: { type: "circle", radius: 30, name: "New shape" } }, { name: "Cube", description: "", type: "shape", icon: { prefix: "fas", name: "cube" }, option: { type: "cube", width: 80, height: 80, name: "New shape" } }], a = [{ name: "Polygon", description: "", type: "drawing", icon: { prefix: "fas", name: "draw-polygon" }, option: { type: "polygon", name: "New polygon" } }, { name: "Line", description: "", type: "drawing", icon: { prefix: "fas", name: "minus" }, option: { type: "line", name: "New line" } }, { name: "Arrow", description: "", type: "drawing", icon: { prefix: "fas", name: "long-arrow-alt-right" }, option: { type: "arrow", name: "New arrow" } }], p = [{ name: "Chart", description: "", type: "element", icon: { prefix: "fas", name: "chart-line" }, option: { superType: "element", type: "chart", name: "New chart", width: 356, height: 356 } }, { name: "Element", description: "", type: "element", icon: { prefix: "fab", name: "html5" }, option: { superType: "element", type: "element", width: 480, height: 270, name: "New element" } }, { name: "Iframe", description: "", type: "element", icon: { prefix: "fas", name: "window-maximize" }, option: { superType: "element", type: "iframe", width: 480, height: 270, name: "New iframe" } }, { name: "Video", description: "", type: "element", icon: { prefix: "fab", name: "youtube" }, option: { superType: "element", type: "video", width: 480, height: 270, name: "New video", autoplay: !0, muted: !0, loop: !0 } }], o = [{ name: "Default", description: "", type: "default", icon: { prefix: "fas", name: "bezier-curve" }, option: { type: "svg", superType: "svg", name: "New SVG", loadType: "file", src: "./images/sample/chiller.svg" } }], r = {
+  MARKER: e,
+  TEXT: t,
+  IMAGE: i,
+  SHAPE: n,
+  DRAWING: a,
+  ELEMENT: p,
+  SVG: o
+};
+export {
+  a as DRAWING,
+  p as ELEMENT,
+  i as IMAGE,
+  e as MARKER,
+  n as SHAPE,
+  o as SVG,
+  t as TEXT,
+  r as default
+};
