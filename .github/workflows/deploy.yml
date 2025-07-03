@@ -25,7 +25,4 @@ jobs:
         ssh -i ~/.ssh/id_rsa_sign_assign_editor ubuntu@3.109.198.252 << EOF
           cd /var/www/html/sign-assign/sign-assign-editor/
           git pull origin main
-          yarn install --frozen-lockfile
-          yarn build
-          pm2 reload ecosystem.config.js
         EOF
