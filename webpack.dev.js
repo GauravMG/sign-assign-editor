@@ -36,7 +36,7 @@ module.exports = merge(baseConfig, {
 	plugins: [
 		new HtmlWebpackPlugin({
 			filename: 'index.html',
-			title: 'React Design Editor',
+			title: 'Sign Assign Editor',
 		}),
 	],
 });

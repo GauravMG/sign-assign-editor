@@ -19,9 +19,9 @@ module.exports = merge(baseConfig, {
 	plugins: [
 		new HtmlWebpackPlugin({
 			filename: 'index.html',
-			title: 'React Design Editor',
+			title: 'Sign Assign Editor',
 			meta: {
-				description: 'React Design Editor with direct manipulation like PowerPoint',
+				description: 'Sign Assign Editor with direct manipulation like PowerPoint',
 			},
 		}),
 		new WorkboxPlugin.GenerateSW({

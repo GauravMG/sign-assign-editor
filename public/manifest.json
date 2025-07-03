@@ -1,11 +1,11 @@
 {
-    "short_name": "React Design Editor",
-    "name": "React Design Editor",
+    "short_name": "Sign Assign Editor",
+    "name": "Sign Assign Editor",
     "icons": [
         {
-            "src": "favicon.ico",
+            "src": "cropped-sign-assign_icon-32x32.jpg",
             "sizes": "64x64",
-            "type": "image/png"
+            "type": "image/jpg"
         }
     ],
     "start_url": "/",
