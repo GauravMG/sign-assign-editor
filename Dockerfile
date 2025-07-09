@@ -1,20 +1,15 @@
-# base image
-FROM node:18-alpine as build
+FROM node:18-alpine3.18 as build
 
-# set working directory
 WORKDIR /app
+COPY . .
 
-ADD . .
+RUN npm install -g pnpm --registry=https://registry.npmmirror.com
+RUN pnpm config set registry https://registry.npmmirror.com
+RUN pnpm install
 
-RUN npm i -g pnpm
-RUN pnpm i
+RUN ["pnpm", "build"]
 
-RUN pnpm build
+FROM nginx:1.25.3
+COPY --from=0 /app/dist /usr/share/nginx/html/
+COPY nginx.conf /etc/nginx/conf.d/
 
-FROM nginx:1.19-alpine
-
-COPY nginx/templates /etc/nginx/templates/
-
-COPY --from=build /app/dist /usr/share/nginx/html
-
-CMD ["nginx", "-g", "daemon off;"]

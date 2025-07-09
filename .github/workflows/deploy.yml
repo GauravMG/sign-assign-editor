@@ -10,19 +10,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa_sign_assign_editor
-        chmod 600 ~/.ssh/id_rsa_sign_assign_editor
-        ssh-keyscan -H 3.109.198.252 >> ~/.ssh/known_hosts
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa_sign_assign_editor
+          chmod 600 ~/.ssh/id_rsa_sign_assign_editor
+          ssh-keyscan -H 3.109.198.252 >> ~/.ssh/known_hosts
 
-    - name: Deploy to EC2
-      run: |
-        ssh -i ~/.ssh/id_rsa_sign_assign_editor ubuntu@3.109.198.252 << EOF
-          cd /var/www/html/sign-assign/sign-assign-editor/
-          git pull origin main
-        EOF
+      - name: Deploy to EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa_sign_assign_editor ubuntu@3.109.198.252 << EOF
+            cd /var/www/html/sign-assign/sign-assign-editor/
+            git pull origin main
+          EOF

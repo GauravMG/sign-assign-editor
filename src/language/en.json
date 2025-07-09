@@ -1,0 +1,264 @@
+{
+	"bgSeting": {
+		"size": "Size",
+		"color": "Color",
+		"colorMacthing": "Color Matching",
+		"width": "Width",
+		"height": "Height"
+	},
+	"flip": {
+		"x": "Flip Horizontally",
+		"y": "Flip Vertically"
+	},
+	"attrSeting": {
+		"group": "Group",
+		"unGroup": "Ungroup",
+		"flip": {
+			"name": "Flip",
+			"x": "Flip Horizontally",
+			"y": "Flip Vertically"
+		},
+		"align": {
+			"name": "Align",
+			"left": "Align Left",
+			"centerX": "Align Center Horizontally",
+			"right": "Align Right",
+			"top": "Align Top",
+			"bottom": "Align Bottom",
+			"centerY": "Align Center Vertically",
+			"averageX": "Distribute Horizontally",
+			"averageY": "Distribute Vertically"
+		},
+		"centerAlign": {
+			"name": "Center",
+			"centerX": "Center Horizontally",
+			"center": "Center Horizontally and Vertically",
+			"centerY": "Center Vertically"
+		}
+	},
+	"color": "Color",
+	"textFloat": "Decimal",
+	"templates": "Templates",
+	"elements": "Elements",
+	"font_style": "Text",
+	"background": "Background",
+	"grid": "Grid",
+	"placeholder": "Please enter",
+	"common_elements": "Basic Elements",
+	"draw_elements": "Drawing Elements",
+	"code_img": "Barcode Image",
+	"background_texture": "Background Texture",
+	"picture": "Picture",
+	"everything_is_fine": "Everything is Fine",
+	"everything_goes_well": "All Goes Smoothly",
+	"cartoon": "Cartoon",
+	"default_size": "Default Size",
+	"preview": "Preview",
+	"save": {
+		"empty": "Clear",
+		"down": "Download",
+		"save_my_spase": "Save to My Space",
+		"save_as_picture": "PNG Image",
+		"save_as_svg": "SVG Image",
+		"copy_to_clipboard": "Copy to Clipboard",
+		"copy_to_clipboardstr": "Copy String to Clipboard",
+		"save_as_json": "Save as JSON"
+	},
+	"layers": "Layers",
+	"my_spase": {
+		"remove_templ": "Delete Template",
+		"remove_templTip": "Are you sure you want to delete this template?",
+		"remove_file_type": "Are you sure you want to delete the folder?",
+		"remove_file_type_Tip": "Are you sure you want to delete this template?"
+	},
+	"title_template": "Title Template",
+	"insert_svg": "Insert SVG Element",
+	"select_svg": "Select SVG File",
+	"please_choose": "Please Choose",
+	"string": "String",
+	"file": "File",
+	"importFiles": {
+		"file": "File",
+		"createDesign": {
+			"title": "Create Design",
+			"customSize": "Custom Size",
+			"systemSize": "Recommended Size",
+			"width": "Width",
+			"height": "Height",
+			"create": "Confirm"
+		},
+		"importFiles": "Import File"
+	},
+	"select_json": "Select JSON File",
+	"repleaceImg": "Replace Image",
+	"cropperImg": "Crop Image",
+	"createClip": "Add Clipping",
+	"removeClip": "Remove Clipping",
+	"polygonClip": "Polygon",
+	"rectClip": "Rectangle",
+	"circleClip": "Circle",
+	"triangleClip": "Triangle",
+	"polygonClipInverted": "Polygon [Inverted]",
+	"rectClipInverted": "Rectangle [Inverted]",
+	"circleClipInverted": "Circle [Inverted]",
+	"triangleClipInverted": "Triangle [Inverted]",
+	"waterMark": {
+		"text": "Watermark",
+		"modalTitle": "Configure Watermark",
+		"setting": {
+			"name": "Watermark Name",
+			"size": "Watermark Size",
+			"color": "Watermark Color",
+			"angle": "Watermark Angle",
+			"position": {
+				"label": "Watermark Position",
+				"lt": "Top Left",
+				"rt": "Top Right",
+				"lb": "Bottom Left",
+				"rb": "Bottom Right",
+				"full": "Tile"
+			}
+		}
+	},
+	"material": {
+		"cartoon": "Material"
+	},
+	"filters": {
+		"simple": "Simple Filters",
+		"complex": "Complex Filters",
+		"Invert": "Invert",
+		"Sepia": "Sepia",
+		"BlackWhite": "Black and White",
+		"Brownie": "Brownie",
+		"Vintage": "Vintage",
+		"Kodachrome": "Kodachrome",
+		"technicolor": "Technicolor",
+		"Polaroid": "Polaroid",
+		"Grayscale": "Grayscale",
+		"GrayscaleList": {
+			"average": "Average",
+			"lightness": "Lightness",
+			"luminosity": "Luminosity"
+		},
+		"RemoveColor": "Remove Color",
+		"Brightness": "Brightness",
+		"Contrast": "Contrast",
+		"Saturation": "Saturation",
+		"Vibrance": "Vibrance",
+		"HueRotation": "Hue Rotation",
+		"Noise": "Noise",
+		"Pixelate": "Pixelate",
+		"Blur": "Blur",
+		"Gamma": "Gamma"
+	},
+	"quick": {
+		"del": "Delete",
+		"copy": "Copy",
+		"lock": "Lock",
+		"unlock": "Unlock",
+		"hide": "Hide",
+		"editPoly": "Edit Polygon"
+	},
+	"insertFile": {
+		"insert": "Insert",
+		"insert_picture": "Insert Image",
+		"insert_SVG": "Insert SVG Element",
+		"insert_SVGStr": "Insert SVG String",
+		"insert_PSD": "Insert PSD",
+		"insert_SVGStr_placeholder": "Please enter SVG string",
+		"modal_tittle": "Please Enter"
+	},
+	"history": {
+		"revocation": "Undo",
+		"redo": "Redo"
+	},
+	"upload_background": "Upload Background",
+	"mouseMenu": {
+		"layer": "Layer Management",
+		"copy": "Copy",
+		"delete": "Delete",
+		"group": "Group",
+		"unGroup": "Ungroup",
+		"up": "Move Up",
+		"down": "Move Down",
+		"upTop": "Move to Top",
+		"downTop": "Move to Bottom",
+		"center": "Center Horizontally and Vertically"
+	},
+	"alert": {
+		"loading_fonts": "Loading fonts, please wait...",
+		"loading_fonts_failed": "Failed to load fonts, please try again!",
+		"loading_fonts_success": "Fonts loaded successfully!",
+		"loading_data": "Loading data...",
+		"select_image": "Please select a background image",
+		"select_file": "Please select a file",
+		"copied_sucessful": "Copied successfully",
+		"fail_copy": "Copy failed"
+	},
+	"scenary_x": "Scenario {number}",
+	"red_book_vertical": "Red Book Vertical",
+	"red_book_horizontal": "Red Book Horizontal",
+	"phone_wallpaper": "Phone Wallpaper",
+	"attributes": {
+		"id": "ID",
+		"linkData": "Link",
+		"font": "Font",
+		"align": "Align",
+		"bold": "Bold:",
+		"italic": "Italic:",
+		"underline": "Underline:",
+		"stroke": "Stroke",
+		"swipe_up": "Swipe Up:",
+		"line_height": "Line Height",
+		"char_spacing": "Character Spacing",
+		"exterior": "Appearance",
+		"angle": "Rotation",
+		"left": "X Axis",
+		"top": "Y Axis",
+		"opacity": "Opacity",
+		"shadow": "Shadow",
+		"blur": "Blur",
+		"offset_x": "X Offset",
+		"offset_y": "Y Offset",
+		"borderRadiusX": "Horizontal Border Radius",
+		"borderRadiusY": "Vertical Border Radius",
+		"rx_ry": "Radius"
+	},
+	"setSizeTip": "Adjust Canvas Size",
+	"tip": "Tip",
+	"clearTip": "Are you sure you want to clear?",
+	"replaceTip": "Are you sure you want to add it to the canvas?",
+	"ok": "OK",
+	"cancel": "Cancel",
+	"cleanUp": "Clear",
+	"login": {
+		"title": "Welcome",
+		"welcome": "Welcome to Kuaipic",
+		"login": "Login",
+		"register": "Register",
+		"identifier": "Username",
+		"username": "Username",
+		"password": "Password",
+		"email": "Email",
+		"identifierValidate": "Please enter username",
+		"passwordValidate": "Please enter a password of at least 6 characters",
+		"emailValidate": "Please enter a valid email address",
+		"logoutTip": "Are you sure you want to log out?",
+		"logoutSuccessTip": "Logged out successfully"
+	},
+	"myMaterial": {
+		"uploadBtn": "Upload Material"
+	},
+	"admin": {
+		"btnTitle": "Admin",
+		"setToken": "Set Token",
+		"save": "Save",
+		"create": "Create New",
+		"addTempl": "Add Template",
+		"addTemplPlaceholder": "Please enter template name",
+		"addTemplCheckTip": "Template name cannot be empty"
+	},
+	"mine": "Mine",
+	"batch": "Batch",
+	"width": "Width"
+}
