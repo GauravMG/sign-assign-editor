@@ -19,11 +19,11 @@ import CanvasSizePanel from "../../components/CanvasSizePanel";
 
 const { Sider, Content } = Layout;
 
-const VITE_BASE_PATH_WEB = "http://3.109.198.252";
-const VITE_BASE_PATH_API = "http://3.109.198.252/api";
+// const VITE_BASE_PATH_WEB = "http://3.109.198.252";
+// const VITE_BASE_PATH_API = "http://3.109.198.252/api";
 
-// const VITE_BASE_PATH_WEB = "http://localhost:8080";
-// const VITE_BASE_PATH_API = "http://10.10.10.17:9101";
+const VITE_BASE_PATH_WEB = "http://localhost:8080";
+const VITE_BASE_PATH_API = "http://10.10.10.17:9101";
 
 const VITE_APP_PEXELS_BASE_PATH = "https://api.pexels.com";
 const VITE_APP_PEXELS_KEY =
@@ -46,6 +46,7 @@ const GraphicsEditor: React.FC = () => {
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [designURL, setDesignURL] = useState<string | null>(null);
 	const [uploading, setUploading] = useState(false);
+	const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null)
 
 	useEffect(() => {
 		const init = async () => {
@@ -55,6 +56,8 @@ const GraphicsEditor: React.FC = () => {
 				const params = new URLSearchParams(window.location.search);
 				const encoded = params.get("data");
 
+				let selectedTemplateIdFromURL: any = null
+
 				if (encoded) {
 					const decodedStr = atob(encoded);
 					const decodedParams = new URLSearchParams(decodedStr);
@@ -63,13 +66,15 @@ const GraphicsEditor: React.FC = () => {
 					const returnUrl = decodedParams.get("returnUrl");
 					const token = decodedParams.get("token");
 					const productId = decodedParams.get("productId");
-					const selectedTemplateId = decodedParams.get("selectedTemplateId");
+					selectedTemplateIdFromURL = decodedParams.get("selectedTemplateId");
 
 					if (returnUrl) localStorage.setItem("returnUrl", returnUrl);
 					if (token) localStorage.setItem("token", token);
 					if (productId) localStorage.setItem("productId", productId);
-					if (selectedTemplateId)
-						localStorage.setItem("selectedTemplateId", selectedTemplateId);
+					if (selectedTemplateIdFromURL) {
+						localStorage.setItem("selectedTemplateId", selectedTemplateIdFromURL);
+						setSelectedTemplateId(Number(selectedTemplateIdFromURL))
+					}
 
 					console.log("Decoded query params:", {
 						token,
@@ -90,7 +95,9 @@ const GraphicsEditor: React.FC = () => {
 					defaultCursor: "default",
 				});
 
-				await handleLoadRemoteArtwork();
+				if (selectedTemplateIdFromURL) {
+					await handleLoadRemoteArtwork();
+				}
 			} catch (error) {
 				console.error(error);
 				message.error("Failed to initialize editor.");
@@ -212,7 +219,103 @@ const GraphicsEditor: React.FC = () => {
 			hide();
 			setUploading(false);
 		}
-	};	
+	};
+
+	const handleSave = async () => {
+		if (!canvasRef.current) {
+			message.error("Canvas is not initialized.");
+			return;
+		}
+	
+		setUploading(true);
+	
+		const hide = message.loading({
+			content: "Uploading your design...",
+			key: "upload",
+			duration: 0,
+		});
+	
+		try {
+			// 1. Export SVG string
+			const svgString = canvasRef.current.toSVG();
+	
+			// 2. Convert to File
+			const blob = new Blob([svgString], { type: "image/svg+xml" });
+			const file = new File([blob], "design.svg", {
+				type: "image/svg+xml",
+			});
+	
+			// 3. Upload as FormData
+			const formData = new FormData();
+			formData.append("file", file);
+	
+			let headers: any = {};
+			let token = localStorage.getItem("token") || "";
+			if (token.length) {
+				headers = {
+					...headers,
+					Authorization: `Bearer ${token}`,
+				};
+			}
+	
+			const response = await fetch(
+				`${VITE_BASE_PATH_API}/v1/upload/artwork`,
+				{
+					method: "POST",
+					headers,
+					body: formData,
+				}
+			);
+	
+			if (!response.ok) {
+				throw new Error("Upload API failed");
+			}
+	
+			const { data } = await response.json();
+	
+			console.log("Upload successful:", data);
+	
+			message.loading({
+				content: "Design uploaded successfully!",
+				key: "upload",
+				duration: 0
+			});
+
+			const templateCreatePayload = {
+				previewUrl: data.previewUrl,
+				name: data.name,
+				size: data.size,
+				mediaType: data.mediaType,
+				mediaUrl: data.url
+            }
+
+			await fetch(
+				`${VITE_BASE_PATH_API}/v1/template/create`,
+				{
+					method: "POST",
+					headers,
+					body: JSON.stringify(templateCreatePayload),
+				}
+			);
+	
+			message.success({
+				content: "Design uploaded successfully!",
+				key: "upload",
+			});
+
+			const returnUrl = localStorage.getItem("returnUrl") || "";
+			window.location.href = `${returnUrl}`;
+		} catch (error) {
+			console.error(error);
+			message.error({
+				content: "Failed to upload design.",
+				key: "upload",
+			});
+		} finally {
+			hide();
+			setUploading(false);
+		}
+	}
 
 	const addText = () => {
 		const text = new fabric.Textbox("Edit me!", {
@@ -699,7 +802,8 @@ const GraphicsEditor: React.FC = () => {
 					</div>
 
 					{/* Back to Website Button */}
-					<div
+					{selectedTemplateId && (
+						<div
 						style={{
 							width: "100%",
 							padding: "16px",
@@ -720,6 +824,7 @@ const GraphicsEditor: React.FC = () => {
 							Back to Website
 						</Button>
 					</div>
+					)}
 				</Sider>
 
 				<Layout>
@@ -746,21 +851,39 @@ const GraphicsEditor: React.FC = () => {
 				</Layout>
 			</Layout>
 
-			<Button
-				type="primary"
-				style={{
-					position: "fixed",
-					bottom: 24,
-					right: 24,
-					zIndex: 1000,
-					backgroundColor: "#452e73",
-					borderColor: "#452e73",
-					color: "#fff",
-				}}
-				onClick={handleContinue}
-			>
-				Continue
-			</Button>
+			{selectedTemplateId ? (
+				<Button
+					type="primary"
+					style={{
+						position: "fixed",
+						bottom: 24,
+						right: 24,
+						zIndex: 1000,
+						backgroundColor: "#452e73",
+						borderColor: "#452e73",
+						color: "#fff",
+					}}
+					onClick={handleContinue}
+				>
+					Continue
+				</Button>
+			) : (
+				<Button
+					type="primary"
+					style={{
+						position: "fixed",
+						bottom: 24,
+						right: 24,
+						zIndex: 1000,
+						backgroundColor: "#452e73",
+						borderColor: "#452e73",
+						color: "#fff",
+					}}
+					onClick={handleSave}
+				>
+					Save
+				</Button>
+			)}
 
 			<Modal
 				title={<div style={{ fontSize: 20, fontWeight: 600, color: "#452e73" }}>🎨 Design Preview</div>}
