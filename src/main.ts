@@ -23,6 +23,7 @@ async function bootstrap() {
 		token: p.get("token"),
 		productId: p.get("productId"),
 		selectedTemplateId: p.get("selectedTemplateId"),
+		selectedTemplateMediaUrl: p.get("selectedTemplateMediaUrl"),
 		selectedSize: JSON.parse(p.get("selectedSize") || "{}"),
 		returnUrl: p.get("returnUrl")
 	})

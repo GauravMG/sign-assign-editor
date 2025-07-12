@@ -8,7 +8,7 @@
 
 <template>
 	<div class="box attr-item-box" v-if="isOne && selectType !== 'image' && selectType !== 'group'">
-		<Divider plain orientation="left"><h4>颜色</h4></Divider>
+		<Divider plain orientation="left"><h4>Color</h4></Divider>
 		<!-- 通用属性 -->
 		<div class="bg-item">
 			<Tooltip placement="top" theme="light">
@@ -16,7 +16,7 @@
 				<template #content>
 					<color-picker
 						v-model:value="baseAttr.fill"
-						:modes="['渐变', '纯色']"
+						:modes="['Gradient', 'Solid Color']"
 						@change="colorChange"
 						@nativePick="dropColor"
 					></color-picker>

@@ -8,7 +8,7 @@
 <template>
 	<div class="box attr-item-box" v-if="isOne && isMatchType">
 		<!-- <h3>圆角</h3> -->
-		<Divider plain orientation="left"><h4>圆角</h4></Divider>
+		<Divider plain orientation="left"><h4>Corner Radius</h4></Divider>
 		<!-- 通用属性 -->
 		<div>
 			<Row :gutter="10">

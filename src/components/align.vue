@@ -9,7 +9,7 @@
 <template>
 	<div v-if="isMultiple" class="attr-item-box">
 		<!-- <h3>对齐</h3> -->
-		<Divider plain orientation="left"><h4>对齐</h4></Divider>
+		<Divider plain orientation="left"><h4>Align</h4></Divider>
 		<div class="bg-item">
 			<!-- 水平对齐 -->
 			<Tooltip :content="$t('attrSeting.align.left')">

@@ -11,13 +11,6 @@
 						<dragMode v-if="state.show" />
 						<zoom />
 					</div>
-					<Button
-						type="primary"
-						@click="onLoadPSD"
-						style="position: absolute; top: 10px; right: 10px"
-					>
-						Load PSD
-					</Button>
 				</div>
 				<Right v-if="state.show" />
 			</Content>
@@ -26,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, onMounted, onUnmounted, inject} from "vue"
+import {reactive, ref, onMounted, onUnmounted, inject, provide} from "vue"
 import {fabric} from "fabric"
 
 import Top from "./components/top/index.vue"
@@ -41,7 +34,6 @@ import Editor, {
 	DringPlugin,
 	AlignGuidLinePlugin,
 	ControlsPlugin,
-	// ControlsRotatePlugin,
 	CenterAlignPlugin,
 	LayerPlugin,
 	CopyPlugin,
@@ -75,8 +67,10 @@ import Editor, {
 
 const APIHOST = import.meta.env.APP_APIHOST
 
+// Inject global params including selectedSize (width, height, unit)
 const global = inject<{
 	selectedSize: {width: number; height: number; unit: "in" | "ft"}
+	selectedTemplateMediaUrl: string
 	returnUrl: string
 }>("globalParams")!
 
@@ -84,31 +78,36 @@ const modalVisible = ref(false)
 const state = reactive({show: false, ruler: true})
 const canvasEditor = new Editor() as IEditor
 
-// DPI & unit-to-pixel conversion
-fabric.DPI = 300
-function unitToPx(v: number, unit: "in" | "ft") {
-	if (unit === "ft") return v * 12 * fabric.DPI
-	return fabric.util.parseUnit(`${v}in`)
+// Set fabric DPI for conversions (default 96 is standard CSS DPI)
+fabric.DPI = 96
+
+// Convert selectedSize (width/height) from ft or in to pixels
+function unitToPx(value: number, unit: "in" | "ft") {
+	if (unit === "ft") {
+		return value * 12 * fabric.DPI // feet -> inches -> pixels
+	}
+	return value * fabric.DPI // inches -> pixels
 }
 
 let fixedW = 0,
 	fixedH = 0
 
 onMounted(() => {
+	// Initialize fabric canvas
 	const canvas = new fabric.Canvas("canvas", {
-		fireRightClick: true, // 启用右键，button的数字为3
-		stopContextMenu: true, // 禁止默认右键菜单
-		controlsAboveOverlay: true, // 超出clipPath后仍然展示控制条
-		// imageSmoothingEnabled: false, // 解决文字导出后不清晰问题
-		preserveObjectStacking: true // 当选择画布中的对象时，让对象不在顶层。
+		fireRightClick: true,
+		stopContextMenu: true,
+		controlsAboveOverlay: true,
+		preserveObjectStacking: true
 	})
 	canvasEditor.init(canvas)
+
+	// Use plugins as before
 	canvasEditor
 		.use(DringPlugin)
 		.use(PolygonModifyPlugin)
 		.use(AlignGuidLinePlugin)
 		.use(ControlsPlugin)
-		// .use(ControlsRotatePlugin)
 		.use(CenterAlignPlugin)
 		.use(LayerPlugin)
 		.use(CopyPlugin)
@@ -145,42 +144,102 @@ onMounted(() => {
 	state.show = true
 	if (state.ruler) canvasEditor.rulerEnable()
 
-	// Set fixed canvas size:
-	fixedW = Number(unitToPx(global.selectedSize.width, global.selectedSize.unit))
-	fixedH = Number(unitToPx(global.selectedSize.height, global.selectedSize.unit))
-	canvas.setWidth(fixedW)
-	canvas.setHeight(fixedH)
+	// Convert selectedSize to px
+	fixedW = unitToPx(global.selectedSize.width, global.selectedSize.unit)
+	fixedH = unitToPx(global.selectedSize.height, global.selectedSize.unit)
 
-	console.log("Canvas fixed size:", fixedW, "×", fixedH)
+	// Set fixed canvas size
+	// canvas.setWidth(fixedW)
+	// canvas.setHeight(fixedH)
+	canvasEditor.setSize(fixedW, fixedH)
+
+	console.log("Canvas fixed size before PSD load:", fixedW, fixedH)
+
+	canvasEditor.on("sizeChange", () => {
+		console.log("Intercepting sizeChange!")
+		canvasEditor.setSize(fixedW, fixedH)
+
+		const canvas = (canvasEditor as any).canvas(canvasEditor as any).canvas.renderAll()
+
+		const bgRect = canvas.getObjects().find((obj) => obj.id === "fixedBackgroundRect")
+		if (!bgRect) {
+			const rect = new fabric.Rect({
+				id: "fixedBackgroundRect",
+				left: 0,
+				top: 0,
+				width: fixedW,
+				height: fixedH,
+				fill: "#ffffff",
+				selectable: false,
+				evented: false
+			})
+			canvas.insertAt(rect, 0)
+		} else {
+			bgRect.set({
+				width: fixedW,
+				height: fixedH
+			})
+		}
+
+		canvas.requestRenderAll()
+	})
+
+	// Load PSD template
+	async function loadPSDAndFit(url: string, fixedW: number, fixedH: number) {
+		await canvasEditor.loadPSDFromUrl(url)
+
+		// Wait for any async mutations the plugin does internally (next tick or frame)
+		await new Promise((resolve) => requestAnimationFrame(resolve))
+
+		const canvas = (canvasEditor as any).canvas
+
+		// Force canvas to fixed size again
+		canvas.setDimensions({width: fixedW, height: fixedH})
+
+		// Optional: match HTML canvas style for clarity
+		canvas.getElement().style.width = fixedW + "px"
+		canvas.getElement().style.height = fixedH + "px"
+
+		// Now get PSD group (may be group or multiple layers)
+		const psdGroup = canvas
+			.getObjects()
+			.find((obj) => obj.type === "group" || obj.type === "activeSelection")
+
+		if (psdGroup) {
+			const padding = 20
+			const maxWidth = fixedW - padding * 2
+			const maxHeight = fixedH - padding * 2
+
+			const scaleX = maxWidth / psdGroup.width!
+			const scaleY = maxHeight / psdGroup.height!
+			const scale = Math.min(scaleX, scaleY, 1)
+
+			psdGroup.scale(scale)
+
+			psdGroup.set({
+				left: (fixedW - psdGroup.getScaledWidth()) / 2,
+				top: (fixedH - psdGroup.getScaledHeight()) / 2
+			})
+
+			psdGroup.setCoords()
+			canvas.renderAll()
+
+			console.log("Canvas forced to fixed size:", fixedW, fixedH)
+		}
+	}
+	loadPSDAndFit(global.selectedTemplateMediaUrl, fixedW, fixedH)
 })
 
 onUnmounted(() => canvasEditor.destory())
 
-function onLoadPSD() {
-	const beforeW = fixedW,
-		beforeH = fixedH
-	console.log("Before loading PSD; canvas size:", fixedW, fixedH)
-
-	canvasEditor.insertPSD().then(() => {
-		// the PSD plugin may have resized the canvas internally
-		const canvas = (canvasEditor as any).canvas // bypass TS encapsulation
-		canvas.setWidth(beforeW)
-		canvas.setHeight(beforeH)
-		canvas.renderAll()
-
-		console.log("After PSD insert, canvas size STILL:", fixedW, fixedH)
-		// Done—canvas dimensions remain unchanged.
-	})
-}
-
 function rulerSwitch(val: boolean) {
-	val ? canvasEditor.rulerEnable() : canvasEditor.rulerDisable()
+	if (val) canvasEditor.rulerEnable()
+	else canvasEditor.rulerDisable()
 	document.activeElement?.blur()
 }
 
 provide("fabric", fabric)
 provide("canvasEditor", canvasEditor)
-// provide('mixinState', mixinState);
 </script>
 
 <style lang="less" scoped>
@@ -204,11 +263,22 @@ provide("canvasEditor", canvasEditor)
 	display: block;
 }
 
+// .canvas-box {
+// 	position: relative;
+// }
 .canvas-box {
 	position: relative;
+	width: fit-content;
+	height: fit-content;
+	margin: 0 auto;
 }
 
-// 画布内阴影
+#canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
 .inside-shadow {
 	position: absolute;
 	width: 100%;
@@ -219,9 +289,11 @@ provide("canvasEditor", canvasEditor)
 }
 
 #canvas {
-	width: 300px;
-	height: 300px;
-	margin: 0 auto;
+	/* Make canvas actual CSS size reflect fabric size */
+	// width: 100%;
+	// height: 100%;
+	// margin: 0 auto;
+	// display: block;
 }
 
 #workspace {
@@ -232,12 +304,10 @@ provide("canvasEditor", canvasEditor)
 	overflow: hidden;
 }
 
-// 标尺
 .switch {
 	margin-right: 10px;
 }
 
-// 网格背景
 .design-stage-grid {
 	--offsetX: 0px;
 	--offsetY: 0px;

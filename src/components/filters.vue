@@ -9,7 +9,7 @@
 <template>
 	<div v-if="isOne && state.type === 'image'" class="box">
 		<Divider plain orientation="left">
-			<h4>图片滤镜</h4>
+			<h4>Image Filter</h4>
 		</Divider>
 		<Collapse>
 			<Panel name="1">

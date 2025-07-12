@@ -9,11 +9,12 @@ const globalParams = inject<{
 	token: string | null
 	productId: string | null
 	selectedTemplateId: string | null
+	selectedTemplateMediaUrl: string | null
 	selectedSize: {width: number; height: number; unit: "in" | "ft"}
 	returnUrl: string | null
 }>("globalParams")
 
-if (!globalParams || !globalParams.selectedTemplateId) {
+if (!globalParams || !globalParams.selectedTemplateId || !globalParams.selectedTemplateMediaUrl) {
 	throw new Error("Missing required parameters!")
 }
 </script>

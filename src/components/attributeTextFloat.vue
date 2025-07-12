@@ -16,9 +16,9 @@
 						v-model="baseAttr.verticalAlign"
 						@on-change="(value) => changeCommon('verticalAlign', value)"
 					>
-						<Option value="null">无</Option>
-						<Option value="bottom">下标</Option>
-						<Option value="top">上标</Option>
+						<Option value="null">None</Option>
+						<Option value="bottom">Subscript</Option>
+						<Option value="top">Superscript</Option>
 					</Select>
 				</div>
 			</div>

@@ -9,11 +9,11 @@
 <template>
 	<div class="box attr-item-box" v-if="isOne && isMatchType && isBarcode">
 		<!-- <h3>字体属性</h3> -->
-		<Divider plain orientation="left"><h4>条形码属性</h4></Divider>
+		<Divider plain orientation="left"><h4>Barcode Properties</h4></Divider>
 		<div>
 			<div class="flex-view">
 				<div class="flex-item">
-					<span class="label">代码</span>
+					<span class="label">Code</span>
 					<div class="content">
 						<Input v-model="baseAttr.value" @on-change="changeCommon" />
 					</div>
@@ -22,7 +22,7 @@
 
 			<div class="flex-view" v-if="baseAttr.displayValue">
 				<div class="flex-item">
-					<span class="label">文字</span>
+					<span class="label">Text</span>
 					<div class="content">
 						<Input v-model="baseAttr.text" @on-change="changeCommon" />
 					</div>
@@ -31,13 +31,13 @@
 
 			<div class="flex-view">
 				<div class="flex-item">
-					<span class="label">显示</span>
+					<span class="label">Display</span>
 					<div class="content">
 						<Switch v-model="baseAttr.displayValue" @on-change="changeCommon" />
 					</div>
 				</div>
 				<div class="flex-item" v-if="baseAttr.displayValue">
-					<span class="label">垂直</span>
+					<span class="label">Vertical</span>
 					<div class="content">
 						<Select v-model="baseAttr.textPosition" @on-change="changeCommon">
 							<Option value="bottom">bottom</Option>
@@ -64,7 +64,7 @@
 
 			<div class="flex-view">
 				<div class="flex-item">
-					<span class="label">条码</span>
+					<span class="label">Barcode</span>
 					<div class="content">
 						<ColorPicker v-model="baseAttr.lineColor" @on-change="changeCommon" alpha />
 					</div>
@@ -82,13 +82,13 @@
 			</div>
 			<div class="flex-view">
 				<div class="flex-item">
-					<span class="label">背景</span>
+					<span class="label">Background</span>
 					<div class="content">
 						<ColorPicker v-model="baseAttr.background" @on-change="changeCommon" alpha />
 					</div>
 				</div>
 				<div class="flex-item">
-					<span class="label" style="margin-left: 10px">类型</span>
+					<span class="label" style="margin-left: 10px">Type</span>
 					<div class="content">
 						<Select v-model="baseAttr.format" @on-change="changeCommon" style="width: 90px">
 							<Option v-for="item in barcodeTypeList" :value="item" :key="item">

@@ -11,7 +11,7 @@ import psdToJson from "../utils/psd"
 import Psd from "@webtoon/psd"
 import type {IEditor, IPluginTempl} from "@kuaitu/core"
 
-type IPlugin = Pick<PsdPlugin, "insertPSD">
+type IPlugin = Pick<PsdPlugin, "insertPSD" | "loadPSDFromUrl">
 
 declare module "@kuaitu/core" {
 	// eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -20,7 +20,8 @@ declare module "@kuaitu/core" {
 
 class PsdPlugin implements IPluginTempl {
 	static pluginName = "PsdPlugin"
-	static apis = ["insertPSD"]
+	static apis = ["insertPSD", "loadPSDFromUrl"]
+
 	constructor(public canvas: fabric.Canvas, public editor: IEditor) {}
 
 	insertPSD(callback?: () => void) {
@@ -33,11 +34,9 @@ class PsdPlugin implements IPluginTempl {
 						reader.readAsText(file, "UTF-8")
 						reader.onload = async () => {
 							const result = await file.arrayBuffer()
-							// 解析PSD文件
 							const psdFile = Psd.parse(result as ArrayBuffer)
 							console.log(psdFile, "11111")
 							const json = await psdToJson(psdFile)
-							// 加载json
 							this.loadJSON(json, callback)
 							resolve("")
 						}
@@ -45,6 +44,28 @@ class PsdPlugin implements IPluginTempl {
 				})
 				.catch(reject)
 		})
+	}
+
+	/**
+	 * Load a PSD file from a remote URL.
+	 * @param url URL of the PSD file
+	 * @param callback Optional callback after loading
+	 */
+	async loadPSDFromUrl(url: string, callback?: () => void): Promise<void> {
+		try {
+			const response = await fetch(url)
+			if (!response.ok) {
+				throw new Error(`Failed to fetch PSD: ${response.statusText}`)
+			}
+			const arrayBuffer = await response.arrayBuffer()
+			const psdFile = Psd.parse(arrayBuffer)
+			console.log(psdFile, "PSD loaded from URL")
+			const json = await psdToJson(psdFile)
+			this.loadJSON(json, callback)
+		} catch (error) {
+			console.error("Error loading PSD from URL:", error)
+			throw error
+		}
 	}
 
 	loadJSON(json: string, callback?: () => void) {

@@ -9,11 +9,11 @@
 <template>
 	<div class="box attr-item-box" v-if="isOne && isMatchType && isQrcode">
 		<!-- <h3>字体属性</h3> -->
-		<Divider plain orientation="left"><h4>二位码属性</h4></Divider>
+		<Divider plain orientation="left"><h4>QR Code Properties</h4></Divider>
 		<div>
 			<div class="flex-view">
 				<div class="flex-item">
-					<span class="label">内容</span>
+					<span class="label">Content</span>
 					<div class="content">
 						<Input v-model="baseAttr.data" @on-change="changeCommon" />
 					</div>
@@ -26,7 +26,7 @@
 						<InputNumber
 							v-model="baseAttr.width"
 							@on-change="changeCommon"
-							append="宽度"
+							append="Width"
 							:min="1"
 						></InputNumber>
 					</div>
@@ -36,7 +36,7 @@
 						<InputNumber
 							v-model="baseAttr.margin"
 							@on-change="changeCommon"
-							append="边距"
+							append="Margin"
 							:min="1"
 						></InputNumber>
 					</div>
@@ -45,13 +45,13 @@
 
 			<div class="flex-view">
 				<div class="flex-item">
-					<span class="label">散点</span>
+					<span class="label">Scatter</span>
 					<div class="content">
 						<ColorPicker v-model="baseAttr.dotsColor" @on-change="changeCommon" alpha />
 					</div>
 				</div>
 				<div class="flex-item">
-					<span class="label" style="margin-left: 10px">类型</span>
+					<span class="label" style="margin-left: 10px">Type</span>
 					<div class="content">
 						<Select v-model="baseAttr.dotsType" @on-change="changeCommon" style="width: 90px">
 							<Option v-for="item in optionsList.DotsType" :value="item" :key="item">
@@ -64,13 +64,13 @@
 
 			<div class="flex-view">
 				<div class="flex-item">
-					<span class="label">外角</span>
+					<span class="label">Outer Corner</span>
 					<div class="content">
 						<ColorPicker v-model="baseAttr.cornersSquareColor" @on-change="changeCommon" alpha />
 					</div>
 				</div>
 				<div class="flex-item">
-					<span class="label" style="margin-left: 10px">类型</span>
+					<span class="label" style="margin-left: 10px">Type</span>
 					<div class="content">
 						<Select
 							v-model="baseAttr.cornersSquareType"
@@ -86,13 +86,13 @@
 			</div>
 			<div class="flex-view">
 				<div class="flex-item">
-					<span class="label">内角</span>
+					<span class="label">Inner Corner</span>
 					<div class="content">
 						<ColorPicker v-model="baseAttr.cornersDotColor" @on-change="changeCommon" alpha />
 					</div>
 				</div>
 				<div class="flex-item">
-					<span class="label" style="margin-left: 10px">类型</span>
+					<span class="label" style="margin-left: 10px">Type</span>
 					<div class="content">
 						<Select v-model="baseAttr.cornersDotType" @on-change="changeCommon" style="width: 90px">
 							<Option v-for="item in optionsList.cornersDotType" :value="item" :key="item">
@@ -105,13 +105,13 @@
 
 			<div class="flex-view">
 				<div class="flex-item">
-					<span class="label">背景</span>
+					<span class="label">Background</span>
 					<div class="content">
 						<ColorPicker v-model="baseAttr.background" @on-change="changeCommon" alpha />
 					</div>
 				</div>
 				<div class="flex-item">
-					<span class="label" style="margin-left: 10px">容错</span>
+					<span class="label" style="margin-left: 10px">Error Correction</span>
 					<div class="content">
 						<Select
 							v-model="baseAttr.errorCorrectionLevel"

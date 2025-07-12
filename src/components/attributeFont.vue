@@ -9,7 +9,7 @@
 <template>
 	<div class="box attr-item-box" v-if="isOne && isMatchType">
 		<!-- <h3>字体属性</h3> -->
-		<Divider plain orientation="left"><h4>字体属性</h4></Divider>
+		<Divider plain orientation="left"><h4>Font Properties</h4></Divider>
 		<div>
 			<!-- <Divider plain orientation="left">{{ $t('attributes.font') }}</Divider> -->
 			<div class="flex-view">
@@ -17,9 +17,17 @@
 					<div class="left font-selector">
 						<Select v-model="baseAttr.fontFamily" @on-change="changeFontFamily">
 							<Option v-for="item in fontsList" :value="item.name" :key="`font-${item.name}`">
-								<div class="font-item" :style="`background-image:url('${item.img}');`">
+								<!-- <div class="font-item" :style="`background-image:url('${item.img}');`">
 									{{ !item.img ? item : "" }}
-									<!-- 解决无法选中问题 -->
+									!-- 解决无法选中问题 --
+									<span style="display: none">{{ item.name }}</span>
+								</div> -->
+
+								<div
+									class="font-item"
+									:style="item.img ? `background-image:url('${item.img}');` : ''"
+								>
+									{{ item.name }}
 									<span style="display: none">{{ item.name }}</span>
 								</div>
 							</Option>
@@ -29,7 +37,7 @@
 						<InputNumber
 							v-model="baseAttr.fontSize"
 							@on-change="(value) => changeCommon('fontSize', value)"
-							append="字号"
+							append="Font Size"
 							:min="1"
 						></InputNumber>
 					</div>
@@ -156,10 +164,18 @@ const baseAttr = reactive({
 	overline: false
 })
 
-const fontsList = ref([])
-canvasEditor.getFontList().then((list) => {
-	fontsList.value = list
-})
+// const fontsList = ref([])
+// canvasEditor.getFontList().then((list) => {
+// 	console.log(`list ===`, list)
+// 	fontsList.value = list
+// })
+const googleFonts = ["Roboto", "Lobster", "Open Sans", "Montserrat", "Oswald"]
+const fontsList = googleFonts.map((font) => ({
+	name: font,
+	type: "google",
+	file: `https://fonts.gstatic.com/s/${font.toLowerCase().replace(/ /g, "")}/v1/somefontfile.woff2`, // You need real URLs here
+	img: "" // optional
+}))
 
 // 字体对齐方式
 const textAlignList = ["left", "center", "right", "justify"]
@@ -199,11 +215,36 @@ const selectCancel = () => {
 	update?.proxy?.$forceUpdate()
 }
 
+// const changeFontFamily = async (fontName) => {
+// 	if (!fontName) return
+// 	Spin.show()
+// 	canvasEditor.loadFont(fontName).finally(() => Spin.hide())
+// }
 const changeFontFamily = async (fontName) => {
 	if (!fontName) return
+
+	const fontUrl = `https://fonts.googleapis.com/css2?family=${fontName.replace(
+		/\s+/g,
+		"+"
+	)}&display=swap`
+
+	// Check if already loaded
+	const exists = Array.from(document.head.querySelectorAll("link")).some(
+		(link) => link.href === fontUrl
+	)
+	if (!exists) {
+		const link = document.createElement("link")
+		link.href = fontUrl
+		link.rel = "stylesheet"
+		document.head.appendChild(link)
+	}
+
+	// Ask fabric.js to load the font
 	Spin.show()
-	canvasEditor.loadFont(fontName).finally(() => Spin.hide())
+	await canvasEditor.loadFont(fontName)
+	Spin.hide()
 }
+
 const changeFontWeight = (key, value) => {
 	const nValue = value === "normal" ? "bold" : "normal"
 	baseAttr.fontWeight = nValue
